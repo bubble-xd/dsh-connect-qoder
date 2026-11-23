@@ -1,0 +1,6 @@
+# Register both Qoder channels as model providers without changing the
+# profile's default model. The plugin reuses the sign-in each Qoder desktop app
+# already holds; it starts no OAuth flow and stores no credentials of its own.
+- insert:
+    - id: dsh-connect-qoder
+      name: dsh-connect-qoder

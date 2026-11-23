@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "Qoder",
+    "description": "Brings the signed-in Qoder desktop apps (CN and global) into DSH as model providers, with a sidebar panel for accounts, credits, runtimes, and model catalogs.",
+    "detail": "docs/DETAIL.md"
+  }
+}

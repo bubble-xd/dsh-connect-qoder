@@ -1,0 +1,8 @@
+# Local DSH test profile, including generated credentials
+/.dsh-test/
+
+# Installed Node.js dependencies
+/node_modules/
+.dsh-backups/
+/lib/vendor/
+/*.tgz

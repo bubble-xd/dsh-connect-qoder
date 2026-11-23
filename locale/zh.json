@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "Qoder",
+    "description": "把本机已登录的 Qoder 桌面版（国内版与国际版）接入 DSH 作为模型提供方，并带一个侧边栏面板展示账号、额度、运行时与模型目录。",
+    "detail": "docs/DETAIL.zh.md"
+  }
+}
