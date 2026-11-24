@@ -6,7 +6,7 @@ import { runInNewContext } from 'node:vm'
 
 const client = await readFile(new URL('../lib/client.js', import.meta.url), 'utf8')
 
-function renderPage(fetch, signalAPI = AbortSignal) {
+function renderPage(fetch, signalAPI = AbortSignal, slot = 'main', sidebar = {}) {
   const hooks = []
   const effects = []
   let cursor = 0
@@ -39,14 +39,16 @@ function renderPage(fetch, signalAPI = AbortSignal) {
     fetch, AbortController, AbortSignal: signalAPI,
     document: { hidden: true, addEventListener() {}, removeEventListener() {} },
     setInterval() {}, clearInterval() {},
+    setTimeout: sidebar.setTimeout ?? setTimeout, clearTimeout,
   })
   plugin.apply({
     effect: setup => setup(),
     locale: { register() {}, bind: () => key => key },
     slots: {
       inject: (_name, mount) => mount(),
+      entriesOfSlot: () => sidebar.entries ?? [],
       register: ({ name, inject }, component) => {
-        if (name === 'main') page = () => component(inject())
+        if (name === slot) page = () => component(inject())
       },
     },
   })
@@ -54,6 +56,8 @@ function renderPage(fetch, signalAPI = AbortSignal) {
   function render() {
     cursor = 0
     const result = page()
+    const pin = find(result, node => node.type?.name === 'SidebarPin')
+    if (pin) pin.children.push(pin.type(pin.props))
     for (const effect of effects.splice(0)) effect()
     return result
   }
@@ -112,4 +116,32 @@ test('a stalled account response releases the refresh button', async () => {
   const tree = render()
   assert.ok(find(tree, node => node === 'readTimeout'))
   assert.equal(find(tree, node => node.type === 'button' && node.children.includes('refresh')).props.disabled, false)
+})
+
+test('sidebar pin becomes writable after the desktop settings service starts', async () => {
+  let resume
+  let navigationReads = 0
+  const nativePins = []
+  const render = renderPage(async (path, options) => {
+    if (path.endsWith('view=navigation')) {
+      return response({ sidebarPanel: false, sidebarWritable: ++navigationReads > 1 })
+    }
+    if (path.endsWith('/navigation')) {
+      assert.deepEqual(JSON.parse(options.body), { sidebarPanel: true })
+      return response({ sidebarPanel: true })
+    }
+    return response({ channels: [channel(path.endsWith('cn') ? 'cn' : 'global', { connection: 'connected' })] })
+  }, AbortSignal, 'settings.section', {
+    setTimeout: callback => { resume = callback },
+    entries: [{ options: { inject: () => ({ setPinned: (...args) => nativePins.push(args) }) } }],
+  })
+  const pin = () => find(render(), node => node.type === 'label' && node.children.includes('pinSidebar')).children[0]
+  await delay(0)
+  assert.equal(pin().props.disabled, true)
+  await resume()
+  assert.equal(pin().props.disabled, false)
+  pin().props.onChange({ currentTarget: { checked: true } })
+  await delay(0)
+  assert.equal(pin().props.checked, true)
+  assert.deepEqual(nativePins, [['dsh-connect-qoder', true]])
 })
