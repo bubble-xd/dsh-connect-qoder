@@ -1,6 +1,6 @@
 {
   "name": "dsh-connect-qoder",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "type": "module",
   "description": "Brings the signed-in Qoder desktop apps (CN and global) into DSH as model providers, with a sidebar panel.",
   "displayName": "Qoder",

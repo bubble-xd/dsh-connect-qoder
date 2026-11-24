@@ -17,7 +17,7 @@ dsh plugin --profile web add "github:bubble-xd/dsh-connect-qoder"
 
 本地 `link:` 开发安装需先在本目录运行 `npm ci --ignore-scripts`，再让 DSH 加载本目录。插件从 npm 使用两版官方 Qoder Agent SDK。修改后重新启动 DSH，已有会话可继续使用原来的供应商 ID。
 
-侧栏入口默认显示。在 DSH 的插件配置里可用 `sidebarPanel` 控制。支持 `settings.section` 槽位的 DSH 版本也可从 **设置 → Qoder** 打开同一面板。
+侧栏入口默认显示。支持 `settings.section` 槽位的 DSH 版本，可在 **设置 → Qoder** 勾选或取消「固定到左侧栏」，新设置立即生效。也可以通过插件配置的 `sidebarPanel` 修改。
 
 ## 面板
 
